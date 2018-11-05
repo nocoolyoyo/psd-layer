@@ -1,6 +1,4 @@
-/**
- * Created by nocoolyoyo on 2018/8/27.
- */
+#!/usr/bin/env node
 const config = require('./config' )
 const args = require('yargs').argv
 const PSD = require('psd')
@@ -9,11 +7,19 @@ const fs = require('fs')
 const path = require('path')
 const cwd = process.cwd()
 
-const fullFile =  path.resolve(cwd, `${config.preview}`)
+const options = {
+	...config,
+	...args
+}
+
+if(args.config){//读取配置文件
+	 const customConfig = require(path.resolve(cwd,`${args.config}`))
+	Object.assign(options, customConfig)
+}
 
 const SliceInfos = []
+const fullFile =  path.resolve(cwd, `${options.preview}`)
 
-console.log(args)
 
 const emptyDir = function(fileUrl){
 	const files = fs.readdirSync(fileUrl);//读取该文件夹
@@ -28,14 +34,14 @@ const emptyDir = function(fileUrl){
 }
 
 async function clean() {
-	if (fs.existsSync(config.output)){
-		emptyDir(config.output)
-		await fs.rmdir(config.output, (err) => {
+	if (fs.existsSync(options.output)){
+		emptyDir(options.output)
+		await fs.rmdir(options.output, (err) => {
 			if (err) throw err;
 		})
 	}
 
-	await fs.mkdir(config.output, { recursive: true }, (err) => {
+	await fs.mkdir(options.output, { recursive: true }, (err) => {
 		if (err) throw err;
 	});
 }
@@ -46,7 +52,7 @@ async function psdPipe() {
 	if(fs.existsSync(fullFile)){
 		fs.unlinkSync(fullFile)
 	}
-	const result = await PSD.open(config.input)
+	const result = await PSD.open(options.input)
 	if(result) {
 		await result.image.saveAsPng(fullFile)
 	}
@@ -86,8 +92,8 @@ function slicePipe() {
 		})
 
 		images(imageData, ...slice)
-			.save(`${config.output}${config.SliceConfig.prefix + index}.${config.SliceConfig.ext}`, {               //Save the image to a file, with the quality of 50
-				quality : config.SliceConfig.quality                    //保存图片到文件,图片质量为50
+			.save(`${options.output}${options.SliceConfig.prefix + index}.${options.SliceConfig.ext}`, {               //Save the image to a file, with the quality of 50
+				quality : options.SliceConfig.quality                    //保存图片到文件,图片质量为50
 			})
 	})
 }
@@ -104,7 +110,7 @@ function genPsdLayer() {
 				minHeight = 0
 
 		for(let i = 0; i < SliceInfos.length; i++){
-			bgImageStr += `url(~@/static-layer/${config.SliceConfig.prefix + i}.${config.SliceConfig.ext}),`
+			bgImageStr += `url(~@/static-layer/${options.SliceConfig.prefix + i}.${options.SliceConfig.ext}),`
 			bgPositionStr += `center ${i === 0 ? '0': `${100 * i}vw`},`
 			bgRepeatStr += 'no-repeat,'
 			bgSizeStr += '100vw auto,'
@@ -117,7 +123,7 @@ function genPsdLayer() {
 		bgSizeStr = bgSizeStr.substring(0, bgSizeStr.length - 1)
 
 		return ` 
-			${config.$Layer} {
+			${options.$Layer} {
 				min-height: ${minHeight}vw;
 		    background-image: ${bgImageStr};
 		    background-position: ${bgPositionStr};
@@ -127,7 +133,7 @@ function genPsdLayer() {
 		`
 	}
 
-	fs.writeFile(`${config.output}/${config.outputName}`, _genBgStyles(), (err) => {
+	fs.writeFile(`${options.output}/${options.outputName}`, _genBgStyles(), (err) => {
 		if (err) throw err;
 		console.log('psdLayer输出成功！');
 	})

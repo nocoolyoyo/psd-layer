@@ -1,4 +1,4 @@
-# psd-to-html
+# psd-layer
 
 >PSD生成html层
 
@@ -8,9 +8,9 @@ yarn add onemt-image-min
 ```
 ## 使用
 ```shell
-npx psd-to-html
+npx psd-layer --config.output=src/static-layer
 ```
-## 指定路径
+## 指定配置
 ```shell
-npx psd-to-html --config.output=src/static-layer
+npx psd-to-html --config=./config/psd.js
 ```
