@@ -1,6 +1,6 @@
 {
   "name": "psd-layer",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "psd转html layer",
   "main": "index.js",
   "author": "nocoolyoyo",

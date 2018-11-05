@@ -92,14 +92,14 @@ function slicePipe() {
 		})
 
 		images(imageData, ...slice)
-			.save(`${options.output}${options.SliceConfig.prefix + index}.${options.SliceConfig.ext}`, {               //Save the image to a file, with the quality of 50
-				quality : options.SliceConfig.quality                    //保存图片到文件,图片质量为50
+			.save(`${options.output}${options.prefix + index}.${options.ext}`, {               //Save the image to a file, with the quality of 50
+				quality : options.quality                    //保存图片到文件,图片质量为50
 			})
 	})
 }
 
 /**
- * 生成vue组件
+ * 生成层样式
  */
 function genPsdLayer() {
 	function _genBgStyles() {
@@ -110,7 +110,7 @@ function genPsdLayer() {
 				minHeight = 0
 
 		for(let i = 0; i < SliceInfos.length; i++){
-			bgImageStr += `url(~@/static-layer/${options.SliceConfig.prefix + i}.${options.SliceConfig.ext}),`
+			bgImageStr += `url(~@/static-layer/${options.prefix + i}.${options.ext}),`
 			bgPositionStr += `center ${i === 0 ? '0': `${100 * i}vw`},`
 			bgRepeatStr += 'no-repeat,'
 			bgSizeStr += '100vw auto,'
@@ -138,7 +138,6 @@ function genPsdLayer() {
 		console.log('psdLayer输出成功！');
 	})
 }
-
 
 async function run(){
 	await clean()
